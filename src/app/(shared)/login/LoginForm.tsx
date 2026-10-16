@@ -12,14 +12,14 @@ export function LoginForm({ failed }: { failed: boolean }) {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState(failed ? '로그인하지 못했어요. 다시 시도해 주세요.' : '');
 
-  async function google() {
+  async function oauth(provider: 'google') {
     setMessage('');
     const supabase = createClient();
     const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
+      provider,
       options: { redirectTo: `${window.location.origin}/auth/callback` },
     });
-    if (error) setMessage('구글 로그인이 아직 설정되지 않았어요. 아래 이메일 로그인을 써 주세요.');
+    if (error) setMessage('이 로그인 방법이 아직 설정되지 않았어요. 아래 이메일 로그인을 써 주세요.');
   }
 
   async function emailLink(e: React.FormEvent) {
@@ -36,7 +36,7 @@ export function LoginForm({ failed }: { failed: boolean }) {
     else setSent(true);
   }
 
-  // 학교 메일의 보안 검사기가 링크를 먼저 열어 버리면 링크가 만료된다. 숫자 코드는 그런 일이 없다.
+  // 메일 양식에 {{ .Token }}을 넣으면(사용자 SMTP 필요) 링크 대신 숫자 코드로도 로그인할 수 있다.
   async function verifyCode(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
@@ -52,7 +52,7 @@ export function LoginForm({ failed }: { failed: boolean }) {
     <div className="card">
       {googleEnabled ? (
         <>
-          <button className="btn primary" type="button" onClick={google} style={{ justifyContent: 'center' }}>
+          <button className="btn primary" type="button" onClick={() => oauth('google')} style={{ justifyContent: 'center' }}>
             구글 계정으로 로그인
           </button>
           <div className="hint" style={{ textAlign: 'center' }}>
@@ -63,7 +63,7 @@ export function LoginForm({ failed }: { failed: boolean }) {
       {sent ? (
         <form className="stack" onSubmit={verifyCode}>
           <p className="notice">
-            <b>{email}</b>로 로그인 메일을 보냈어요. 메일에 있는 <b>숫자 코드</b>를 아래에 넣어 주세요.
+            <b>{email}</b>로 로그인 메일을 보냈어요. 메일의 링크를 이 브라우저에서 눌러 주세요. 메일에 <b>숫자 코드</b>가 있으면 아래에 넣어도 돼요.
           </p>
           <div className="field">
             <label htmlFor="code">메일로 받은 숫자 코드</label>
@@ -89,7 +89,7 @@ export function LoginForm({ failed }: { failed: boolean }) {
             <input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="teacher@school.kr" />
           </div>
           <button className="btn" type="submit" disabled={busy}>
-            {busy ? '보내는 중…' : '이메일로 로그인 코드 받기'}
+            {busy ? '보내는 중…' : '이메일로 로그인 링크 받기'}
           </button>
         </form>
       )}
