@@ -2,6 +2,9 @@
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 
+// Supabase에서 Google 로그인을 켠 뒤에만 버튼을 보여 준다(.env의 NEXT_PUBLIC_GOOGLE_LOGIN=on)
+const googleEnabled = process.env.NEXT_PUBLIC_GOOGLE_LOGIN === 'on';
+
 export function LoginForm({ failed }: { failed: boolean }) {
   const [email, setEmail] = useState('');
   const [sent, setSent] = useState(false);
@@ -34,12 +37,16 @@ export function LoginForm({ failed }: { failed: boolean }) {
 
   return (
     <div className="card">
-      <button className="btn primary" type="button" onClick={google} style={{ justifyContent: 'center' }}>
-        구글 계정으로 로그인
-      </button>
-      <div className="hint" style={{ textAlign: 'center' }}>
-        또는
-      </div>
+      {googleEnabled ? (
+        <>
+          <button className="btn primary" type="button" onClick={google} style={{ justifyContent: 'center' }}>
+            구글 계정으로 로그인
+          </button>
+          <div className="hint" style={{ textAlign: 'center' }}>
+            또는
+          </div>
+        </>
+      ) : null}
       {sent ? (
         <p className="notice">
           <b>{email}</b>로 로그인 링크를 보냈어요. 메일함에서 링크를 누르면 이 화면으로 돌아와요. 같은 브라우저에서 눌러 주세요.
