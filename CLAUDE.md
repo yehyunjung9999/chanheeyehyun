@@ -1,0 +1,27 @@
+# 보장지도 매니저 — AI 작업 규칙
+
+- 먼저 PRD.md를 읽는다. 기준이 되는 곳은 다음과 같다.
+  - 업무 규칙: 제2부 4장
+  - 데이터: 7장
+  - 파트 경계: 6.2
+  - 보안: 13장
+  - 화면: docs/mockup/index.html
+- 자기 파트 폴더만 수정한다. 공통 파일(파트 0) 변경은 "공통 변경 요청"으로 사람에게 넘긴다.
+- 작업은 자기 브랜치(part-a / part-b)에서만 한다. main에 직접 push하지 않는다.
+- 화면 문구는 한국어로 쓴다. 기준 숫자는 settings에서 읽고 하드코딩하지 않는다(src/lib/settings.ts).
+- 스타일은 src/app/globals.css의 공통 클래스(card, btn, chip, badge, table-wrap, kpi …)를 쓴다. globals.css는 고치지 않는다.
+- 데이터 읽기·쓰기는 서버(서버 컴포넌트·서버 액션)에서 한다.
+  - 서버 액션은 requireTeacher()로 시작하고 runAction()으로 감싸서 { ok, message }를 돌려준다.
+  - 1000행이 넘을 수 있는 표는 fetchAll()로 읽는다.
+- 학생 이름을 DB·API·로그·AI 요청에 넣지 않는다. 이름 표시는 <StudentName studentNo>만 쓴다.
+- 시수는 0.5 단위라서 2배 한 정수로 계산한다. 원점수는 제2부 4.2 반올림 규칙을 따른다(src/lib/rules/scoring.ts).
+- 커밋 전에 npm run build와 npm test를 통과시킨다. 새 npm 패키지는 사람에게 먼저 알린다.
+- dorms-check 기준을 지킨다.
+  - 새 테이블은 RLS를 켜고, anon으로 조회하면 0행인지 확인한다(npm run test:rls).
+  - 새 API 라우트는 requireTeacher()로 막는다.
+  - 비밀키는 서버 전용으로 쓰고 NEXT_PUBLIC_을 붙이지 않는다.
+  - eval과 dangerouslySetInnerHTML을 쓰지 않는다.
+  - CORS를 열지 않는다.
+  - 민감정보를 저장하지 않는다.
+  - 학생 정보를 console.log로 찍지 않는다.
+- 사용자는 개발 초보 교사다. 사람이 해야 할 일은 어디를 누르는지 쉬운 말로 한 단계씩 안내한다.
