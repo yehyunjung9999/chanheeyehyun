@@ -3,10 +3,18 @@
 import fs from 'node:fs';
 import pg from 'pg';
 
-const url = process.env.DATABASE_URL;
+let url = process.env.DATABASE_URL;
 if (!url) {
   console.error('✗ .env.local 에 DATABASE_URL 이 없어요. Supabase → Connect → "Session pooler" 주소를 넣어 주세요.');
   process.exit(1);
+}
+// 주소를 복사한 그대로 [YOUR-PASSWORD] 가 남아 있으면 DB_PASSWORD 값으로 바꿔 끼운다(특수문자도 안전하게).
+if (url.includes('[YOUR-PASSWORD]')) {
+  if (!process.env.DB_PASSWORD) {
+    console.error('✗ DATABASE_URL 에 [YOUR-PASSWORD] 가 있어요. .env.local 의 DB_PASSWORD 에 DB 비밀번호를 넣어 주세요.');
+    process.exit(1);
+  }
+  url = url.replace('[YOUR-PASSWORD]', encodeURIComponent(process.env.DB_PASSWORD));
 }
 
 const seedOnly = process.argv.includes('--seed-only');

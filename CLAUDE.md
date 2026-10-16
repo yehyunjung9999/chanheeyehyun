@@ -18,6 +18,7 @@
 - 커밋 전에 npm run build와 npm test를 통과시킨다. 새 npm 패키지는 사람에게 먼저 알린다.
 - dorms-check 기준을 지킨다.
   - 새 테이블은 RLS를 켜고, anon으로 조회하면 0행인지 확인한다(npm run test:rls).
+  - 새 테이블은 자동 공개가 꺼져 있다. 그래서 `grant select, insert, update, delete on public.<표> to authenticated;`를 직접 써 준다.
   - 새 API 라우트는 requireTeacher()로 막는다.
   - 비밀키는 서버 전용으로 쓰고 NEXT_PUBLIC_을 붙이지 않는다.
   - eval과 dangerouslySetInnerHTML을 쓰지 않는다.

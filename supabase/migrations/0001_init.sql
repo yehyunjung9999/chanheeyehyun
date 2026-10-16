@@ -358,6 +358,11 @@ create trigger completion_results_guard before insert or update on public.comple
 
 -- ── 행 수준 보안(RLS) ──
 revoke all on all tables in schema public from anon;
+-- 로그인한 교사(authenticated)에게는 표 권한을 직접 준다. Supabase의 "새 테이블 자동 공개"를 꺼도 동작하게 하려는 것이다.
+-- 실제로 어떤 행을 볼 수 있는지는 아래 RLS 정책이 정한다.
+grant usage on schema public to authenticated;
+grant select, insert, update, delete on all tables in schema public to authenticated;
+grant execute on function public.is_approved(), public.is_admin() to authenticated;
 
 alter table public.teachers enable row level security;
 create policy teachers_select on public.teachers for select to authenticated using (public.is_approved() or id = auth.uid());
